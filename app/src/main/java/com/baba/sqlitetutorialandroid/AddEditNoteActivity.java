@@ -11,7 +11,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 
-public class AddNoteActivity extends AppCompatActivity {
+public class AddEditNoteActivity extends AppCompatActivity {
+    public static final String EXTRA_ID = "com.baba.sqlitetutorialandroid.EXTRA_ID";
     public static final String EXTRA_TITLE = "com.baba.sqlitetutorialandroid.EXTRA_TITLE";
     public static final String EXTRA_DESCRIPTION = "com.baba.sqlitetutorialandroid.EXTRA_DESCRIPTION";
     public static final String EXTRA_PRIORITY = "com.baba.sqlitetutorialandroid.EXTRA_PRIORITY";
@@ -33,28 +34,44 @@ public class AddNoteActivity extends AppCompatActivity {
         numberPickerPriority.setMaxValue(10);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        setTitle("Add Note");
+
+        //If we want to update then this will run
+        Intent intent = getIntent();
+
+        if (intent.hasExtra(EXTRA_ID)) {
+            setTitle("Edit Note");
+            editTextTitle.setText(intent.getStringExtra(EXTRA_TITLE));
+            editTextDescription.setText(intent.getStringExtra(EXTRA_DESCRIPTION));
+            numberPickerPriority.setValue(intent.getIntExtra(EXTRA_PRIORITY, 1));
+        } else {
+            setTitle("Add Note");
+        }
     }
 
-    private void saveNote(){
+    private void saveNote() {
         String title = editTextTitle.getText().toString().trim();
         String description = editTextDescription.getText().toString().trim();
         int priority = numberPickerPriority.getValue();
 
-        if (title.isEmpty()){
+        if (title.isEmpty()) {
             editTextTitle.setError("Enter the title");
             return;
         }
-        if (description.isEmpty()){
+        if (description.isEmpty()) {
             editTextDescription.setError("Enter the description");
             return;
         }
         Intent data = new Intent();
-        data.putExtra(EXTRA_TITLE,title);
-        data.putExtra(EXTRA_DESCRIPTION,description);
-        data.putExtra(EXTRA_PRIORITY,priority);
+        data.putExtra(EXTRA_TITLE, title);
+        data.putExtra(EXTRA_DESCRIPTION, description);
+        data.putExtra(EXTRA_PRIORITY, priority);
 
-        setResult(RESULT_OK,data);
+        int id = getIntent().getIntExtra(EXTRA_ID, -1);
+        if (id != -1) {
+            data.putExtra(EXTRA_ID, id);
+        }
+
+        setResult(RESULT_OK, data);
         finish();
     }
 
